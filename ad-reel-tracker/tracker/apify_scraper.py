@@ -31,8 +31,9 @@ def _parse_apify_item(data: dict, shortcode: str, url: str, label: str, collecte
     saves = data.get("savesCount")
     caption = data.get("caption")
     hashtags = data.get("hashtags", [])
+    owner_username = data.get("ownerUsername")
+    owner_name = data.get("ownerFullName")
 
-    # Use views if available, else fall back to plays for engagement calc
     engagement_views = views or plays
     engagement_rate = _compute_engagement_rate(engagement_views, likes, comments_count)
 
@@ -43,6 +44,7 @@ def _parse_apify_item(data: dict, shortcode: str, url: str, label: str, collecte
         collected_at=collected_at,
         source="apify",
         views=views,
+        plays=plays,
         likes=likes,
         comments=comments_count,
         shares=shares,
@@ -50,6 +52,8 @@ def _parse_apify_item(data: dict, shortcode: str, url: str, label: str, collecte
         caption=caption,
         hashtags=hashtags if isinstance(hashtags, list) else [],
         engagement_rate=engagement_rate,
+        owner_username=owner_username,
+        owner_name=owner_name,
     )
 
 

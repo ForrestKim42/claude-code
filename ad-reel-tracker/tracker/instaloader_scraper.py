@@ -23,6 +23,7 @@ class ReelMetrics:
     collected_at: str
     source: str
     views: Optional[int] = None
+    plays: Optional[int] = None
     likes: Optional[int] = None
     comments: Optional[int] = None
     shares: Optional[int] = None
@@ -31,6 +32,8 @@ class ReelMetrics:
     caption: Optional[str] = None
     hashtags: list = field(default_factory=list)
     engagement_rate: Optional[float] = None
+    owner_username: Optional[str] = None
+    owner_name: Optional[str] = None
     error: Optional[str] = None
 
     def to_dict(self) -> dict:
@@ -41,6 +44,7 @@ class ReelMetrics:
             "collected_at": self.collected_at,
             "source": self.source,
             "views": self.views,
+            "plays": self.plays,
             "likes": self.likes,
             "comments": self.comments,
             "shares": self.shares,
@@ -49,6 +53,8 @@ class ReelMetrics:
             "caption": self.caption,
             "hashtags": self.hashtags,
             "engagement_rate": self.engagement_rate,
+            "owner_username": self.owner_username,
+            "owner_name": self.owner_name,
             "error": self.error,
         }
 

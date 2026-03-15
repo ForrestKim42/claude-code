@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS reel_metrics (
     collected_at TEXT NOT NULL,
     source TEXT NOT NULL,
     views INTEGER,
+    plays INTEGER,
     likes INTEGER,
     comments INTEGER,
     shares INTEGER,
@@ -30,6 +31,8 @@ CREATE TABLE IF NOT EXISTS reel_metrics (
     engagement_rate REAL,
     caption TEXT,
     hashtags TEXT,
+    owner_username TEXT,
+    owner_name TEXT,
     error TEXT
 );
 """
@@ -57,9 +60,9 @@ def save_metrics(conn: sqlite3.Connection, metrics: ReelMetrics) -> int:
         """
         INSERT INTO reel_metrics
             (shortcode, url, label, collected_at, source,
-             views, likes, comments, shares, saves, reach,
-             engagement_rate, caption, hashtags, error)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             views, plays, likes, comments, shares, saves, reach,
+             engagement_rate, caption, hashtags, owner_username, owner_name, error)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             metrics.shortcode,
@@ -68,6 +71,7 @@ def save_metrics(conn: sqlite3.Connection, metrics: ReelMetrics) -> int:
             metrics.collected_at,
             metrics.source,
             metrics.views,
+            metrics.plays,
             metrics.likes,
             metrics.comments,
             metrics.shares,
@@ -76,6 +80,8 @@ def save_metrics(conn: sqlite3.Connection, metrics: ReelMetrics) -> int:
             metrics.engagement_rate,
             metrics.caption,
             json.dumps(metrics.hashtags) if metrics.hashtags else "[]",
+            metrics.owner_username,
+            metrics.owner_name,
             metrics.error,
         ),
     )

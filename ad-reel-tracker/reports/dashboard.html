@@ -3,368 +3,474 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Instagram Ad Reel Performance Dashboard</title>
+<title>광고 릴스 성과 대시보드</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-         background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 24px; }
-  h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
-  .subtitle { color: #94a3b8; font-size: 0.875rem; margin-bottom: 28px; }
-  .section-title { font-size: 1rem; font-weight: 600; color: #94a3b8;
-                    text-transform: uppercase; letter-spacing: 0.05em;
-                    margin: 32px 0 16px; }
-  /* Cards */
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-  .card { background: #1e293b; border-radius: 12px; padding: 20px;
-           border: 1px solid #334155; }
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start;
-                  margin-bottom: 16px; }
-  .card-label { font-weight: 600; font-size: 0.95rem; }
-  .card-source { font-size: 0.7rem; color: #64748b; background: #0f172a;
-                  padding: 2px 8px; border-radius: 9999px; }
-  .card-url { font-size: 0.72rem; color: #4F46E5; margin-bottom: 14px;
-               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .card-url a { color: #818cf8; text-decoration: none; }
-  .card-url a:hover { text-decoration: underline; }
-  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .metric { background: #0f172a; border-radius: 8px; padding: 10px 12px; }
-  .metric-name { font-size: 0.7rem; color: #64748b; text-transform: uppercase;
-                  letter-spacing: 0.05em; margin-bottom: 4px; }
-  .metric-value { font-size: 1.25rem; font-weight: 700; }
-  .delta { font-size: 0.7rem; margin-left: 6px; font-weight: 500; }
-  .delta.up { color: #34d399; }
-  .delta.down { color: #f87171; }
-  .delta.neutral { color: #64748b; }
-  .card-error { color: #f87171; font-size: 0.8rem; margin-top: 8px; }
-  .card-collected { font-size: 0.7rem; color: #475569; margin-top: 12px; }
-  /* Charts */
-  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
-  .chart-card { background: #1e293b; border-radius: 12px; padding: 20px;
-                 border: 1px solid #334155; }
-  .chart-card h3 { font-size: 0.875rem; font-weight: 600; color: #94a3b8; margin-bottom: 16px; }
-  .chart-wrap { position: relative; height: 260px; }
-  /* No data */
-  .no-data { color: #475569; font-size: 0.875rem; padding: 40px 0; text-align: center; }
-  footer { margin-top: 40px; text-align: center; font-size: 0.75rem; color: #334155; }
+:root {
+  --bg: #0a0f1e;
+  --surface: #111827;
+  --surface2: #1f2937;
+  --border: #1f2937;
+  --text: #f1f5f9;
+  --muted: #64748b;
+  --accent: #6366f1;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, 'Segoe UI', sans-serif; background: var(--bg);
+        color: var(--text); padding: 28px 32px; max-width: 1300px; margin: 0 auto; }
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Header */
+.header { margin-bottom: 28px; }
+.header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+.header .meta { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+/* Insight box */
+.insight { background: #0f172a; border: 1px solid #1e3a5f; border-left: 3px solid var(--accent);
+            border-radius: 10px; padding: 14px 18px; margin-bottom: 28px;
+            font-size: 0.85rem; line-height: 1.8; color: #cbd5e1; }
+
+/* Summary bar */
+.summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 32px; }
+.sum-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+             padding: 14px 16px; cursor: default; transition: border-color .2s; }
+.sum-card:hover { border-color: #374151; }
+.sum-rank { font-size: 1.1rem; margin-bottom: 6px; }
+.sum-name { font-size: 0.75rem; font-weight: 600; color: #e2e8f0; margin-bottom: 2px;
+             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sum-handle { font-size: 0.68rem; color: var(--muted); margin-bottom: 10px; }
+.sum-views { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em; }
+.sum-views span { font-size: 0.65rem; font-weight: 400; color: var(--muted); margin-left: 3px; }
+.bar-wrap { margin-top: 8px; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 2px; }
+
+/* Section */
+.section { margin-bottom: 36px; }
+.section-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+                  letter-spacing: 0.1em; color: var(--muted); margin-bottom: 14px; }
+
+/* Metric cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+         padding: 18px 20px; position: relative; overflow: hidden; }
+.card::before { content: attr(data-rank); position: absolute; top: 12px; right: 16px;
+                 font-size: 1.3rem; opacity: .35; }
+.card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.card-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center;
+                justify-content: center; font-size: 1rem; font-weight: 700; flex-shrink: 0; }
+.card-who { min-width: 0; }
+.card-name { font-size: 0.9rem; font-weight: 700; white-space: nowrap;
+              overflow: hidden; text-overflow: ellipsis; }
+.card-handle { font-size: 0.72rem; color: var(--muted); }
+.card-url { font-size: 0.68rem; color: #818cf8; }
+
+/* Metrics table inside card */
+.metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 2px; }
+.metric { background: var(--bg); border-radius: 8px; padding: 9px 11px; }
+.metric-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: .06em;
+                 color: var(--muted); margin-bottom: 4px; }
+.metric-val { font-size: 1.05rem; font-weight: 700; }
+.metric-sub { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+.dup { color: #34d399; font-size: 0.65rem; margin-left: 4px; }
+.ddn { color: #f87171; font-size: 0.65rem; margin-left: 4px; }
+.d0  { color: var(--muted); font-size: 0.65rem; margin-left: 4px; }
+
+/* Engagement badge */
+.eng-badge { display: inline-block; padding: 2px 8px; border-radius: 9999px;
+              font-size: 0.68rem; font-weight: 700; margin-left: 6px; }
+.eng-high { background: #064e3b; color: #34d399; }
+.eng-mid  { background: #1c1917; color: #fbbf24; }
+.eng-low  { background: #1f1212; color: #f87171; }
+
+/* Charts */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 860px) { .charts-grid { grid-template-columns: 1fr; } }
+.chart-card { background: var(--surface); border: 1px solid var(--border);
+               border-radius: 12px; padding: 20px; }
+.chart-card h3 { font-size: 0.78rem; font-weight: 600; color: var(--muted);
+                  text-transform: uppercase; letter-spacing: .07em; margin-bottom: 16px; }
+.chart-wrap { position: relative; height: 230px; }
+
+.collected { font-size: 0.65rem; color: #334155; margin-top: 12px; text-align: right; }
+footer { text-align: center; font-size: 0.7rem; color: #1e293b; margin-top: 40px; }
 </style>
 </head>
 <body>
-<h1>📊 Instagram Ad Reel Dashboard</h1>
-<p class="subtitle">Generated: 2026-03-15 04:35 UTC &nbsp;·&nbsp; Last 30 days</p>
 
-<p class="section-title">Latest Metrics</p>
-<div class="cards">
+<div class="header">
+  <h1>📊 광고 릴스 성과 대시보드</h1>
+  <div class="meta">수집: 2026-03-15 04:43 UTC &nbsp;·&nbsp; 최근 30일 데이터</div>
+</div>
 
-  <div class="card">
-    <div class="card-header">
-      <span class="card-label">Ad Reel 1</span>
-      <span class="card-source">apify</span>
-    </div>
-    <div class="card-url"><a href="https://www.instagram.com/reel/DV0fRYczORi/" target="_blank">https://www.instagram.com/reel/DV0fRYczORi/</a></div>
-    <div class="metrics-grid">
-      <div class="metric">
-        <div class="metric-name">Views</div>
-        <div class="metric-value">963<span class="delta up">+1</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Likes</div>
-        <div class="metric-value">27<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Comments</div>
-        <div class="metric-value">3<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Engagement</div>
-        <div class="metric-value">3.12%</div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Shares</div>
-        <div class="metric-value">—<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Saves</div>
-        <div class="metric-value">—</div>
-      </div>
-    </div>
-    
-    <p class="card-collected">수집: 2026-03-15 04:34 UTC</p>
+<div class="insight">📌 조회수 1위는 <b>서윤</b> (34.4K views) — 노출량 최고<br>💬 참여율 1위는 <b>지여닝</b> (6.21%) — 조회수는 낮아도 반응이 뜨거움<br>⚠️ <b>서윤</b>은 조회수(34.4K) 대비 참여율(0.40%)이 낮음 — 광고 소재 개선 검토</div>
+
+<div class="section">
+  <div class="section-label">조회수 순위</div>
+  <div class="summary">
+  <div class="sum-card">
+    <div class="sum-rank">🥇</div>
+    <div class="sum-name" title="서윤">서윤</div>
+    <div class="sum-handle">@xeo.yuunny</div>
+    <div class="sum-views">34.4K<span>views</span></div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:100.0%;background:#6366f1"></div></div>
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <span class="card-label">Ad Reel 2</span>
-      <span class="card-source">apify</span>
-    </div>
-    <div class="card-url"><a href="https://www.instagram.com/reel/DV0hL9HEb2H/" target="_blank">https://www.instagram.com/reel/DV0hL9HEb2H/</a></div>
-    <div class="metrics-grid">
-      <div class="metric">
-        <div class="metric-name">Views</div>
-        <div class="metric-value">6.6K<span class="delta up">+2</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Likes</div>
-        <div class="metric-value">223<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Comments</div>
-        <div class="metric-value">4<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Engagement</div>
-        <div class="metric-value">3.45%</div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Shares</div>
-        <div class="metric-value">—<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Saves</div>
-        <div class="metric-value">—</div>
-      </div>
-    </div>
-    
-    <p class="card-collected">수집: 2026-03-15 04:34 UTC</p>
+  <div class="sum-card">
+    <div class="sum-rank">🥈</div>
+    <div class="sum-name" title="하 나">하 나</div>
+    <div class="sum-handle">@ha_n_a0.6</div>
+    <div class="sum-views">6.6K<span>views</span></div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:19.2%;background:#a855f7"></div></div>
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <span class="card-label">Ad Reel 3</span>
-      <span class="card-source">apify</span>
-    </div>
-    <div class="card-url"><a href="https://www.instagram.com/reel/DV0iKVxk3Ew/" target="_blank">https://www.instagram.com/reel/DV0iKVxk3Ew/</a></div>
-    <div class="metrics-grid">
-      <div class="metric">
-        <div class="metric-name">Views</div>
-        <div class="metric-value">34.3K<span class="delta up">+8</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Likes</div>
-        <div class="metric-value">128<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Comments</div>
-        <div class="metric-value">10<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Engagement</div>
-        <div class="metric-value">0.40%</div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Shares</div>
-        <div class="metric-value">—<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Saves</div>
-        <div class="metric-value">—</div>
-      </div>
-    </div>
-    
-    <p class="card-collected">수집: 2026-03-15 04:34 UTC</p>
+  <div class="sum-card">
+    <div class="sum-rank">🥉</div>
+    <div class="sum-name" title="에스더">에스더</div>
+    <div class="sum-handle">@esther_ffff</div>
+    <div class="sum-views">2.0K<span>views</span></div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:5.8%;background:#ec4899"></div></div>
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <span class="card-label">Ad Reel 4</span>
-      <span class="card-source">apify</span>
-    </div>
-    <div class="card-url"><a href="https://www.instagram.com/reel/DV0i7t-Ehq0/" target="_blank">https://www.instagram.com/reel/DV0i7t-Ehq0/</a></div>
-    <div class="metrics-grid">
-      <div class="metric">
-        <div class="metric-name">Views</div>
-        <div class="metric-value">2.0K<span class="delta up">+3</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Likes</div>
-        <div class="metric-value">42<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Comments</div>
-        <div class="metric-value">4<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Engagement</div>
-        <div class="metric-value">2.31%</div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Shares</div>
-        <div class="metric-value">—<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Saves</div>
-        <div class="metric-value">—</div>
-      </div>
-    </div>
-    
-    <p class="card-collected">수집: 2026-03-15 04:34 UTC</p>
+  <div class="sum-card">
+    <div class="sum-rank">4위</div>
+    <div class="sum-name" title="신소윤">신소윤</div>
+    <div class="sum-handle">@thinxoyoon</div>
+    <div class="sum-views">965<span>views</span></div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:2.8%;background:#f59e0b"></div></div>
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <span class="card-label">Ad Reel 5</span>
-      <span class="card-source">apify</span>
+  <div class="sum-card">
+    <div class="sum-rank">5위</div>
+    <div class="sum-name" title="지여닝">지여닝</div>
+    <div class="sum-handle">@caiime_pretty</div>
+    <div class="sum-views">435<span>views</span></div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:1.3%;background:#10b981"></div></div>
+  </div></div>
+</div>
+
+<div class="section">
+  <div class="section-label">릴스별 상세 지표</div>
+  <div class="cards">
+<div class="card" data-rank="🥇">
+  <div class="card-top">
+    <div class="card-avatar" style="background:#6366f122;color:#6366f1">서</div>
+    <div class="card-who">
+      <div class="card-name"><a href="https://www.instagram.com/xeo.yuunny/" target="_blank">서윤</a></div>
+      <div class="card-handle"><a href="https://www.instagram.com/xeo.yuunny/" target="_blank">@xeo.yuunny</a></div>
+      <div class="card-url"><a href="https://www.instagram.com/reel/DV0iKVxk3Ew/" target="_blank">릴스 바로가기 →</a></div>
     </div>
-    <div class="card-url"><a href="https://www.instagram.com/reel/DV0hBoMkkjp/" target="_blank">https://www.instagram.com/reel/DV0hBoMkkjp/</a></div>
-    <div class="metrics-grid">
-      <div class="metric">
-        <div class="metric-name">Views</div>
-        <div class="metric-value">432<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Likes</div>
-        <div class="metric-value">23<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Comments</div>
-        <div class="metric-value">4<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Engagement</div>
-        <div class="metric-value">6.25%</div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Shares</div>
-        <div class="metric-value">—<span class="delta neutral">±0</span></div>
-      </div>
-      <div class="metric">
-        <div class="metric-name">Saves</div>
-        <div class="metric-value">—</div>
-      </div>
+  </div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Views</div>
+      <div class="metric-val">34.4K</div>
+      <div class="metric-sub">순수 조회</div>
     </div>
-    
-    <p class="card-collected">수집: 2026-03-15 04:34 UTC</p>
+    <div class="metric">
+      <div class="metric-label">Plays</div>
+      <div class="metric-val">73.9K</div>
+      <div class="metric-sub">재생 2.2x 반복률</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">참여율</div>
+      <div class="metric-val"><span class="eng-badge eng-low">0.40%</span></div>
+      <div class="metric-sub">likes+comments/views</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Likes</div>
+      <div class="metric-val">128</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Comments</div>
+      <div class="metric-val">10</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Shares / Saves</div>
+      <div class="metric-val">— / —</div>
+    </div>
+  </div>
+  
+  <div class="collected">수집: 2026-03-15 04:42 UTC</div>
+</div>
+
+<div class="card" data-rank="🥈">
+  <div class="card-top">
+    <div class="card-avatar" style="background:#a855f722;color:#a855f7">하</div>
+    <div class="card-who">
+      <div class="card-name"><a href="https://www.instagram.com/ha_n_a0.6/" target="_blank">하 나</a></div>
+      <div class="card-handle"><a href="https://www.instagram.com/ha_n_a0.6/" target="_blank">@ha_n_a0.6</a></div>
+      <div class="card-url"><a href="https://www.instagram.com/reel/DV0hL9HEb2H/" target="_blank">릴스 바로가기 →</a></div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Views</div>
+      <div class="metric-val">6.6K</div>
+      <div class="metric-sub">순수 조회</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Plays</div>
+      <div class="metric-val">20.3K</div>
+      <div class="metric-sub">재생 3.1x 반복률</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">참여율</div>
+      <div class="metric-val"><span class="eng-badge eng-high">3.46%</span></div>
+      <div class="metric-sub">likes+comments/views</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Likes</div>
+      <div class="metric-val">224</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Comments</div>
+      <div class="metric-val">4</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Shares / Saves</div>
+      <div class="metric-val">— / —</div>
+    </div>
+  </div>
+  
+  <div class="collected">수집: 2026-03-15 04:42 UTC</div>
+</div>
+
+<div class="card" data-rank="🥉">
+  <div class="card-top">
+    <div class="card-avatar" style="background:#ec489922;color:#ec4899">에</div>
+    <div class="card-who">
+      <div class="card-name"><a href="https://www.instagram.com/esther_ffff/" target="_blank">에스더</a></div>
+      <div class="card-handle"><a href="https://www.instagram.com/esther_ffff/" target="_blank">@esther_ffff</a></div>
+      <div class="card-url"><a href="https://www.instagram.com/reel/DV0i7t-Ehq0/" target="_blank">릴스 바로가기 →</a></div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Views</div>
+      <div class="metric-val">2.0K</div>
+      <div class="metric-sub">순수 조회</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Plays</div>
+      <div class="metric-val">6.3K</div>
+      <div class="metric-sub">재생 3.2x 반복률</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">참여율</div>
+      <div class="metric-val"><span class="eng-badge eng-mid">2.30%</span></div>
+      <div class="metric-sub">likes+comments/views</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Likes</div>
+      <div class="metric-val">42</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Comments</div>
+      <div class="metric-val">4</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Shares / Saves</div>
+      <div class="metric-val">— / —</div>
+    </div>
+  </div>
+  
+  <div class="collected">수집: 2026-03-15 04:42 UTC</div>
+</div>
+
+<div class="card" data-rank="4위">
+  <div class="card-top">
+    <div class="card-avatar" style="background:#f59e0b22;color:#f59e0b">신</div>
+    <div class="card-who">
+      <div class="card-name"><a href="https://www.instagram.com/thinxoyoon/" target="_blank">신소윤</a></div>
+      <div class="card-handle"><a href="https://www.instagram.com/thinxoyoon/" target="_blank">@thinxoyoon</a></div>
+      <div class="card-url"><a href="https://www.instagram.com/reel/DV0fRYczORi/" target="_blank">릴스 바로가기 →</a></div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Views</div>
+      <div class="metric-val">965</div>
+      <div class="metric-sub">순수 조회</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Plays</div>
+      <div class="metric-val">3.4K</div>
+      <div class="metric-sub">재생 3.5x 반복률</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">참여율</div>
+      <div class="metric-val"><span class="eng-badge eng-high">3.11%</span></div>
+      <div class="metric-sub">likes+comments/views</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Likes</div>
+      <div class="metric-val">27</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Comments</div>
+      <div class="metric-val">3</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Shares / Saves</div>
+      <div class="metric-val">— / —</div>
+    </div>
+  </div>
+  
+  <div class="collected">수집: 2026-03-15 04:42 UTC</div>
+</div>
+
+<div class="card" data-rank="5위">
+  <div class="card-top">
+    <div class="card-avatar" style="background:#10b98122;color:#10b981">지</div>
+    <div class="card-who">
+      <div class="card-name"><a href="https://www.instagram.com/caiime_pretty/" target="_blank">지여닝</a></div>
+      <div class="card-handle"><a href="https://www.instagram.com/caiime_pretty/" target="_blank">@caiime_pretty</a></div>
+      <div class="card-url"><a href="https://www.instagram.com/reel/DV0hBoMkkjp/" target="_blank">릴스 바로가기 →</a></div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Views</div>
+      <div class="metric-val">435</div>
+      <div class="metric-sub">순수 조회</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Plays</div>
+      <div class="metric-val">2.0K</div>
+      <div class="metric-sub">재생 4.7x 반복률</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">참여율</div>
+      <div class="metric-val"><span class="eng-badge eng-high">6.21%</span></div>
+      <div class="metric-sub">likes+comments/views</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Likes</div>
+      <div class="metric-val">23</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Comments</div>
+      <div class="metric-val">4</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Shares / Saves</div>
+      <div class="metric-val">— / —</div>
+    </div>
+  </div>
+  
+  <div class="collected">수집: 2026-03-15 04:42 UTC</div>
+</div></div>
+</div>
+
+<div class="section">
+  <div class="section-label">성과 비교</div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>조회수 비교 (Views)</h3>
+      <div class="chart-wrap"><canvas id="cViews"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>좋아요 · 댓글 비교</h3>
+      <div class="chart-wrap"><canvas id="cEng"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>참여율 비교 (Engagement Rate %)</h3>
+      <div class="chart-wrap"><canvas id="cEngRate"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>재생수 비교 (Plays — 반복 포함)</h3>
+      <div class="chart-wrap"><canvas id="cPlays"></canvas></div>
+    </div>
   </div>
 </div>
 
-<p class="section-title">Performance Over Time</p>
-<div class="charts-grid">
-  <div class="chart-card">
-    <h3>Views 추이</h3>
-    <div class="chart-wrap"><canvas id="viewsChart"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <h3>Likes 추이</h3>
-    <div class="chart-wrap"><canvas id="likesChart"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <h3>Comments 추이</h3>
-    <div class="chart-wrap"><canvas id="commentsChart"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <h3>Engagement Rate (%) 추이</h3>
-    <div class="chart-wrap"><canvas id="engChart"></canvas></div>
+<div class="section">
+  <div class="section-label">시간별 추이</div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Views 추이</h3>
+      <div class="chart-wrap"><canvas id="tViews"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>참여율 추이</h3>
+      <div class="chart-wrap"><canvas id="tEng"></canvas></div>
+    </div>
   </div>
 </div>
 
-<p class="section-title">Comparison (Latest Snapshot)</p>
-<div class="charts-grid">
-  <div class="chart-card">
-    <h3>Views 비교</h3>
-    <div class="chart-wrap"><canvas id="compViewsChart"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <h3>Likes / Comments 비교</h3>
-    <div class="chart-wrap"><canvas id="compEngChart"></canvas></div>
-  </div>
-</div>
-
-<footer>Instagram Ad Reel Tracker — 데이터 수집: Instaloader / Apify</footer>
+<footer>Instagram Ad Reel Tracker · Apify</footer>
 
 <script>
-const COLORS = ["#4F46E5", "#7C3AED", "#EC4899", "#F59E0B", "#10B981"];
-const tsData = {"reels": [{"shortcode": "DV0fRYczORi", "label": "Ad Reel 1", "timestamps": ["2026-03-15 04:32", "2026-03-15 04:34"], "views": [962, 963], "likes": [27, 27], "comments": [3, 3], "engagement_rate": [3.1185, 3.1153]}, {"shortcode": "DV0hBoMkkjp", "label": "Ad Reel 5", "timestamps": ["2026-03-15 04:32", "2026-03-15 04:34"], "views": [432, 432], "likes": [23, 23], "comments": [4, 4], "engagement_rate": [6.25, 6.25]}, {"shortcode": "DV0hL9HEb2H", "label": "Ad Reel 2", "timestamps": ["2026-03-15 04:32", "2026-03-15 04:34"], "views": [6585, 6587], "likes": [223, 223], "comments": [4, 4], "engagement_rate": [3.4472, 3.4462]}, {"shortcode": "DV0i7t-Ehq0", "label": "Ad Reel 4", "timestamps": ["2026-03-15 04:32", "2026-03-15 04:34"], "views": [1987, 1990], "likes": [42, 42], "comments": [4, 4], "engagement_rate": [2.315, 2.3116]}, {"shortcode": "DV0iKVxk3Ew", "label": "Ad Reel 3", "timestamps": ["2026-03-15 04:32", "2026-03-15 04:34"], "views": [34310, 34318], "likes": [128, 128], "comments": [10, 10], "engagement_rate": [0.4022, 0.4021]}]};
-const compData = {"labels": ["Ad Reel 1", "Ad Reel 2", "Ad Reel 3", "Ad Reel 4", "Ad Reel 5"], "shortcodes": ["DV0fRYczORi", "DV0hL9HEb2H", "DV0iKVxk3Ew", "DV0i7t-Ehq0", "DV0hBoMkkjp"], "data": [{"shortcode": "DV0fRYczORi", "label": "Ad Reel 1", "views": 963, "likes": 27, "comments": 3, "shares": 0, "engagement_rate": 3.1153}, {"shortcode": "DV0hL9HEb2H", "label": "Ad Reel 2", "views": 6587, "likes": 223, "comments": 4, "shares": 0, "engagement_rate": 3.4462}, {"shortcode": "DV0iKVxk3Ew", "label": "Ad Reel 3", "views": 34318, "likes": 128, "comments": 10, "shares": 0, "engagement_rate": 0.4021}, {"shortcode": "DV0i7t-Ehq0", "label": "Ad Reel 4", "views": 1990, "likes": 42, "comments": 4, "shares": 0, "engagement_rate": 2.3116}, {"shortcode": "DV0hBoMkkjp", "label": "Ad Reel 5", "views": 432, "likes": 23, "comments": 4, "shares": 0, "engagement_rate": 6.25}]};
+const C = ["#6366f1", "#a855f7", "#ec4899", "#f59e0b", "#10b981"];
+const comp = [{"name": "\uc11c\uc724", "views": 34350, "plays": 73924, "likes": 128, "comments": 10, "er": 0.4}, {"name": "\ud558 \ub098", "views": 6597, "plays": 20295, "likes": 224, "comments": 4, "er": 3.46}, {"name": "\uc5d0\uc2a4\ub354", "views": 2001, "plays": 6304, "likes": 42, "comments": 4, "er": 2.3}, {"name": "\uc2e0\uc18c\uc724", "views": 965, "plays": 3417, "likes": 27, "comments": 3, "er": 3.11}, {"name": "\uc9c0\uc5ec\ub2dd", "views": 435, "plays": 2034, "likes": 23, "comments": 4, "er": 6.21}];
+const ts   = [{"name": "\uc11c\uc724", "ts": [{"t": "2026-03-15 04:42", "v": 34350, "er": 0.4}]}, {"name": "\ud558 \ub098", "ts": [{"t": "2026-03-15 04:42", "v": 6597, "er": 3.46}]}, {"name": "\uc5d0\uc2a4\ub354", "ts": [{"t": "2026-03-15 04:42", "v": 2001, "er": 2.3}]}, {"name": "\uc2e0\uc18c\uc724", "ts": [{"t": "2026-03-15 04:42", "v": 965, "er": 3.11}]}, {"name": "\uc9c0\uc5ec\ub2dd", "ts": [{"t": "2026-03-15 04:42", "v": 435, "er": 6.21}]}];
 
-function makeChartOptions(yLabel) {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
-    scales: {
-      x: { ticks: { color: '#64748b', maxRotation: 30, font: { size: 10 } },
-            grid: { color: '#1e293b' } },
-      y: { ticks: { color: '#64748b', font: { size: 11 } },
-            grid: { color: '#334155' },
-            title: { display: !!yLabel, text: yLabel, color: '#64748b' } }
-    }
-  };
-}
+const baseOpts = (title) => ({
+  responsive: true, maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString() ?? ctx.parsed.x?.toLocaleString()}` } }
+  },
+  scales: {
+    x: { ticks: { color:'#64748b', font:{size:11} }, grid:{ color:'#111827' } },
+    y: { ticks: { color:'#64748b', font:{size:11} }, grid:{ color:'#1f2937' } }
+  }
+});
 
-function makeBarOptions(stacked) {
-  const opts = makeChartOptions(null);
-  opts.scales.x.stacked = stacked;
-  opts.scales.y.stacked = stacked;
-  return opts;
-}
-
-function buildTimeseriesChart(canvasId, metric, label, yLabel) {
-  const ctx = document.getElementById(canvasId);
-  if (!ctx) return;
-  const datasets = tsData.reels.map((r, i) => ({
-    label: r.label,
-    data: r.timestamps.map((t, j) => ({ x: t, y: r[metric][j] })),
-    borderColor: COLORS[i % COLORS.length],
-    backgroundColor: COLORS[i % COLORS.length] + '33',
-    tension: 0.3,
-    fill: false,
-    pointRadius: 3,
-  }));
-  new Chart(ctx, {
-    type: 'line',
-    data: { datasets },
-    options: {
-      ...makeChartOptions(yLabel),
-      scales: {
-        ...makeChartOptions(yLabel).scales,
-        x: { ...makeChartOptions(yLabel).scales.x, type: 'category' }
-      }
-    }
-  });
-}
-
-function buildComparisonChart(canvasId, metrics, labels, stacked) {
-  const ctx = document.getElementById(canvasId);
-  if (!ctx) return;
-  const datasets = metrics.map((m, i) => ({
-    label: m.label,
-    data: compData.labels.map(l => {
-      const r = compData.data.find(d => d.shortcode === compData.shortcodes[compData.labels.indexOf(l)] || d.label === l);
-      return r ? (r[m.key] ?? 0) : 0;
-    }),
-    backgroundColor: COLORS[i % COLORS.length] + 'cc',
-    borderColor: COLORS[i % COLORS.length],
-    borderWidth: 1,
-  }));
-  // Simpler: one dataset per metric, one bar per reel
-  const ds2 = metrics.map((m, i) => ({
-    label: m.label,
-    data: compData.data.map(d => d[m.key] ?? 0),
-    backgroundColor: COLORS[i % COLORS.length] + 'cc',
-    borderColor: COLORS[i % COLORS.length],
-    borderWidth: 1,
-  }));
-  new Chart(ctx, {
+function hBar(id, labels, data, colors, fmt) {
+  new Chart(document.getElementById(id), {
     type: 'bar',
-    data: { labels: compData.data.map(d => d.label), datasets: ds2 },
-    options: makeBarOptions(stacked),
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: colors.map(c=>c+'bb'),
+                    borderColor: colors, borderWidth: 1, borderRadius: 6 }]
+    },
+    options: { ...baseOpts(), indexAxis: 'y',
+      plugins: { ...baseOpts().plugins,
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x?.toLocaleString()}` } } } }
   });
 }
 
-// Build time-series charts
-buildTimeseriesChart('viewsChart', 'views', 'Views', 'Views');
-buildTimeseriesChart('likesChart', 'likes', 'Likes', 'Likes');
-buildTimeseriesChart('commentsChart', 'comments', 'Comments', 'Comments');
-buildTimeseriesChart('engChart', 'engagement_rate', 'Engagement Rate', '%');
+function vBar(id, labels, datasets) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: datasets.map((d,i) => ({
+      label: d.label, data: d.data,
+      backgroundColor: C[i%C.length]+'99', borderColor: C[i%C.length],
+      borderWidth: 1, borderRadius: 4
+    })) },
+    options: baseOpts()
+  });
+}
 
-// Build comparison charts
-buildComparisonChart('compViewsChart', [{label: 'Views', key: 'views'}], [], false);
-buildComparisonChart('compEngChart', [
-  {label: 'Likes', key: 'likes'},
-  {label: 'Comments', key: 'comments'},
-], [], false);
+function line(id, datasets) {
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: { datasets: datasets.map((d,i) => ({
+      label: d.label, data: d.data,
+      borderColor: C[i%C.length], backgroundColor: C[i%C.length]+'22',
+      tension: 0.3, fill: false, pointRadius: 4, pointHoverRadius: 6
+    })) },
+    options: { ...baseOpts(), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, type:'category' } } }
+  });
+}
+
+// Comparison charts
+const labels = comp.map(d => d.name);
+const colors = comp.map((_,i) => C[i%C.length]);
+
+hBar('cViews', labels, comp.map(d=>d.views), colors);
+hBar('cPlays', labels, comp.map(d=>d.plays), colors);
+hBar('cEngRate', labels, comp.map(d=>d.er), colors);
+vBar('cEng', labels, [
+  { label:'좋아요', data: comp.map(d=>d.likes) },
+  { label:'댓글',   data: comp.map(d=>d.comments) },
+]);
+
+// Time-series charts
+line('tViews', ts.map((r,i) => ({ label: r.name, data: r.ts.map(p=>p.v) })));
+line('tEng',   ts.map((r,i) => ({ label: r.name, data: r.ts.map(p=>p.er) })));
 </script>
 </body>
 </html>
