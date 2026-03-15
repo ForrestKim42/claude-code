@@ -1,3 +1,5 @@
+import { fmtCost } from '@/lib/fmt';
+
 interface Row {
   code: string; name: string;
   views: number; sessions: number; ctr: number;
@@ -26,7 +28,7 @@ function CostCell({ val, min, max }: { val: number | null; min: number | null; m
   const cls = costColor(val, min, max);
   return (
     <td className={`px-3 py-3 text-right tabular-nums ${cls}`}>
-      {val.toLocaleString('ko-KR')}원
+      {fmtCost(val)}
     </td>
   );
 }

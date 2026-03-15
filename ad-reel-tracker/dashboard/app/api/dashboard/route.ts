@@ -56,7 +56,7 @@ async function queryNeon(sql: string): Promise<Record<string, unknown>[]> {
 }
 
 function cpx(cost: number, n: number): number | null {
-  return n > 0 ? Math.round(cost / n) : null;
+  return n > 0 ? cost / n : null;
 }
 
 function pct(a: number, b: number): number {

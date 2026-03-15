@@ -1,3 +1,5 @@
+import { fmtCost } from '@/lib/fmt';
+
 interface Today {
   sessions: number;
   phone: number;
@@ -116,7 +118,7 @@ export default function SummaryCards({
         />
         <MetricCard
           label="평균 CP-Lead"
-          value={total.cpph != null ? `${total.cpph.toLocaleString('ko-KR')}원` : '—'}
+          value={total.cpph != null ? fmtCost(total.cpph) : '—'}
           sub="전화 제출 1건당"
         />
       </div>
