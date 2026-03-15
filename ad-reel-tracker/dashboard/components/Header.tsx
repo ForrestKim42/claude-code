@@ -48,6 +48,13 @@ export default function Header({ fetchedAt, isLoading, onRefresh, refreshInterva
           </div>
         )}
 
+        <a
+          href="/leads"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-700 hover:bg-emerald-600 text-sm font-medium transition-colors text-white"
+        >
+          전화 채팅 보기
+        </a>
+
         <button
           onClick={onRefresh}
           disabled={isLoading}
