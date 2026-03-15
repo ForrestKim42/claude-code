@@ -1,0 +1,38 @@
+reels:
+  - url: "https://www.instagram.com/reel/DV0fRYczORi/"
+    shortcode: "DV0fRYczORi"
+    label: "Ad Reel 1"
+  - url: "https://www.instagram.com/reel/DV0hL9HEb2H/"
+    shortcode: "DV0hL9HEb2H"
+    label: "Ad Reel 2"
+  - url: "https://www.instagram.com/reel/DV0iKVxk3Ew/"
+    shortcode: "DV0iKVxk3Ew"
+    label: "Ad Reel 3"
+  - url: "https://www.instagram.com/reel/DV0i7t-Ehq0/"
+    shortcode: "DV0i7t-Ehq0"
+    label: "Ad Reel 4"
+  - url: "https://www.instagram.com/reel/DV0hBoMkkjp/"
+    shortcode: "DV0hBoMkkjp"
+    label: "Ad Reel 5"
+
+collection:
+  interval_hours: 6
+  # Primary scraper: apify (reliable), instaloader (free but fragile)
+  primary: "apify"
+  fallback: "instaloader"
+  # Optional: Instagram login for more data (instaloader)
+  # instagram_username: ""
+  # instagram_session_file: "session"
+
+apify:
+  # Set token via APIFY_API_TOKEN environment variable (recommended)
+  # or paste your token here for local use only (do NOT commit to git)
+  api_token: ""
+  actor_id: "apify/instagram-scraper"
+
+storage:
+  db_path: "data/reels.db"
+
+report:
+  output_dir: "reports"
+  html_file: "dashboard.html"

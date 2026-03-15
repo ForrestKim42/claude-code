@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Ad Reel Performance Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 24px; }
+  h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: #94a3b8; font-size: 0.875rem; margin-bottom: 28px; }
+  .section-title { font-size: 1rem; font-weight: 600; color: #94a3b8;
+                    text-transform: uppercase; letter-spacing: 0.05em;
+                    margin: 32px 0 16px; }
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .card { background: #1e293b; border-radius: 12px; padding: 20px;
+           border: 1px solid #334155; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start;
+                  margin-bottom: 16px; }
+  .card-label { font-weight: 600; font-size: 0.95rem; }
+  .card-source { font-size: 0.7rem; color: #64748b; background: #0f172a;
+                  padding: 2px 8px; border-radius: 9999px; }
+  .card-url { font-size: 0.72rem; color: #4F46E5; margin-bottom: 14px;
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-url a { color: #818cf8; text-decoration: none; }
+  .card-url a:hover { text-decoration: underline; }
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .metric { background: #0f172a; border-radius: 8px; padding: 10px 12px; }
+  .metric-name { font-size: 0.7rem; color: #64748b; text-transform: uppercase;
+                  letter-spacing: 0.05em; margin-bottom: 4px; }
+  .metric-value { font-size: 1.25rem; font-weight: 700; }
+  .delta { font-size: 0.7rem; margin-left: 6px; font-weight: 500; }
+  .delta.up { color: #34d399; }
+  .delta.down { color: #f87171; }
+  .delta.neutral { color: #64748b; }
+  .card-error { color: #f87171; font-size: 0.8rem; margin-top: 8px; }
+  .card-collected { font-size: 0.7rem; color: #475569; margin-top: 12px; }
+  /* Charts */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+  .chart-card { background: #1e293b; border-radius: 12px; padding: 20px;
+                 border: 1px solid #334155; }
+  .chart-card h3 { font-size: 0.875rem; font-weight: 600; color: #94a3b8; margin-bottom: 16px; }
+  .chart-wrap { position: relative; height: 260px; }
+  /* No data */
+  .no-data { color: #475569; font-size: 0.875rem; padding: 40px 0; text-align: center; }
+  footer { margin-top: 40px; text-align: center; font-size: 0.75rem; color: #334155; }
+</style>
+</head>
+<body>
+<h1>📊 Instagram Ad Reel Dashboard</h1>
+<p class="subtitle">Generated: 2026-03-15 04:32 UTC &nbsp;·&nbsp; Last 30 days</p>
+
+<p class="section-title">Latest Metrics</p>
+<div class="cards">
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-label">Ad Reel 1</span>
+      <span class="card-source">apify</span>
+    </div>
+    <div class="card-url"><a href="https://www.instagram.com/reel/DV0fRYczORi/" target="_blank">https://www.instagram.com/reel/DV0fRYczORi/</a></div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-name">Views</div>
+        <div class="metric-value">962</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Likes</div>
+        <div class="metric-value">27</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Comments</div>
+        <div class="metric-value">3</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Engagement</div>
+        <div class="metric-value">3.12%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Shares</div>
+        <div class="metric-value">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Saves</div>
+        <div class="metric-value">—</div>
+      </div>
+    </div>
+    
+    <p class="card-collected">수집: 2026-03-15 04:32 UTC</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-label">Ad Reel 2</span>
+      <span class="card-source">apify</span>
+    </div>
+    <div class="card-url"><a href="https://www.instagram.com/reel/DV0hL9HEb2H/" target="_blank">https://www.instagram.com/reel/DV0hL9HEb2H/</a></div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-name">Views</div>
+        <div class="metric-value">6.6K</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Likes</div>
+        <div class="metric-value">223</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Comments</div>
+        <div class="metric-value">4</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Engagement</div>
+        <div class="metric-value">3.45%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Shares</div>
+        <div class="metric-value">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Saves</div>
+        <div class="metric-value">—</div>
+      </div>
+    </div>
+    
+    <p class="card-collected">수집: 2026-03-15 04:32 UTC</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-label">Ad Reel 3</span>
+      <span class="card-source">apify</span>
+    </div>
+    <div class="card-url"><a href="https://www.instagram.com/reel/DV0iKVxk3Ew/" target="_blank">https://www.instagram.com/reel/DV0iKVxk3Ew/</a></div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-name">Views</div>
+        <div class="metric-value">34.3K</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Likes</div>
+        <div class="metric-value">128</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Comments</div>
+        <div class="metric-value">10</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Engagement</div>
+        <div class="metric-value">0.40%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Shares</div>
+        <div class="metric-value">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Saves</div>
+        <div class="metric-value">—</div>
+      </div>
+    </div>
+    
+    <p class="card-collected">수집: 2026-03-15 04:32 UTC</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-label">Ad Reel 4</span>
+      <span class="card-source">apify</span>
+    </div>
+    <div class="card-url"><a href="https://www.instagram.com/reel/DV0i7t-Ehq0/" target="_blank">https://www.instagram.com/reel/DV0i7t-Ehq0/</a></div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-name">Views</div>
+        <div class="metric-value">2.0K</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Likes</div>
+        <div class="metric-value">42</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Comments</div>
+        <div class="metric-value">4</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Engagement</div>
+        <div class="metric-value">2.31%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Shares</div>
+        <div class="metric-value">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Saves</div>
+        <div class="metric-value">—</div>
+      </div>
+    </div>
+    
+    <p class="card-collected">수집: 2026-03-15 04:32 UTC</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-label">Ad Reel 5</span>
+      <span class="card-source">apify</span>
+    </div>
+    <div class="card-url"><a href="https://www.instagram.com/reel/DV0hBoMkkjp/" target="_blank">https://www.instagram.com/reel/DV0hBoMkkjp/</a></div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-name">Views</div>
+        <div class="metric-value">432</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Likes</div>
+        <div class="metric-value">23</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Comments</div>
+        <div class="metric-value">4</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Engagement</div>
+        <div class="metric-value">6.25%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Shares</div>
+        <div class="metric-value">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-name">Saves</div>
+        <div class="metric-value">—</div>
+      </div>
+    </div>
+    
+    <p class="card-collected">수집: 2026-03-15 04:32 UTC</p>
+  </div>
+</div>
+
+<p class="section-title">Performance Over Time</p>
+<div class="charts-grid">
+  <div class="chart-card">
+    <h3>Views 추이</h3>
+    <div class="chart-wrap"><canvas id="viewsChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Likes 추이</h3>
+    <div class="chart-wrap"><canvas id="likesChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Comments 추이</h3>
+    <div class="chart-wrap"><canvas id="commentsChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Engagement Rate (%) 추이</h3>
+    <div class="chart-wrap"><canvas id="engChart"></canvas></div>
+  </div>
+</div>
+
+<p class="section-title">Comparison (Latest Snapshot)</p>
+<div class="charts-grid">
+  <div class="chart-card">
+    <h3>Views 비교</h3>
+    <div class="chart-wrap"><canvas id="compViewsChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Likes / Comments 비교</h3>
+    <div class="chart-wrap"><canvas id="compEngChart"></canvas></div>
+  </div>
+</div>
+
+<footer>Instagram Ad Reel Tracker — 데이터 수집: Instaloader / Apify</footer>
+
+<script>
+const COLORS = ["#4F46E5", "#7C3AED", "#EC4899", "#F59E0B", "#10B981"];
+const tsData = {"reels": [{"shortcode": "DV0fRYczORi", "label": "Ad Reel 1", "timestamps": ["2026-03-15 04:32"], "views": [962], "likes": [27], "comments": [3], "engagement_rate": [3.1185]}, {"shortcode": "DV0hBoMkkjp", "label": "Ad Reel 5", "timestamps": ["2026-03-15 04:32"], "views": [432], "likes": [23], "comments": [4], "engagement_rate": [6.25]}, {"shortcode": "DV0hL9HEb2H", "label": "Ad Reel 2", "timestamps": ["2026-03-15 04:32"], "views": [6585], "likes": [223], "comments": [4], "engagement_rate": [3.4472]}, {"shortcode": "DV0i7t-Ehq0", "label": "Ad Reel 4", "timestamps": ["2026-03-15 04:32"], "views": [1987], "likes": [42], "comments": [4], "engagement_rate": [2.315]}, {"shortcode": "DV0iKVxk3Ew", "label": "Ad Reel 3", "timestamps": ["2026-03-15 04:32"], "views": [34310], "likes": [128], "comments": [10], "engagement_rate": [0.4022]}]};
+const compData = {"labels": ["Ad Reel 1", "Ad Reel 2", "Ad Reel 3", "Ad Reel 4", "Ad Reel 5"], "shortcodes": ["DV0fRYczORi", "DV0hL9HEb2H", "DV0iKVxk3Ew", "DV0i7t-Ehq0", "DV0hBoMkkjp"], "data": [{"shortcode": "DV0fRYczORi", "label": "Ad Reel 1", "views": 962, "likes": 27, "comments": 3, "shares": 0, "engagement_rate": 3.1185}, {"shortcode": "DV0hL9HEb2H", "label": "Ad Reel 2", "views": 6585, "likes": 223, "comments": 4, "shares": 0, "engagement_rate": 3.4472}, {"shortcode": "DV0iKVxk3Ew", "label": "Ad Reel 3", "views": 34310, "likes": 128, "comments": 10, "shares": 0, "engagement_rate": 0.4022}, {"shortcode": "DV0i7t-Ehq0", "label": "Ad Reel 4", "views": 1987, "likes": 42, "comments": 4, "shares": 0, "engagement_rate": 2.315}, {"shortcode": "DV0hBoMkkjp", "label": "Ad Reel 5", "views": 432, "likes": 23, "comments": 4, "shares": 0, "engagement_rate": 6.25}]};
+
+function makeChartOptions(yLabel) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+    scales: {
+      x: { ticks: { color: '#64748b', maxRotation: 30, font: { size: 10 } },
+            grid: { color: '#1e293b' } },
+      y: { ticks: { color: '#64748b', font: { size: 11 } },
+            grid: { color: '#334155' },
+            title: { display: !!yLabel, text: yLabel, color: '#64748b' } }
+    }
+  };
+}
+
+function makeBarOptions(stacked) {
+  const opts = makeChartOptions(null);
+  opts.scales.x.stacked = stacked;
+  opts.scales.y.stacked = stacked;
+  return opts;
+}
+
+function buildTimeseriesChart(canvasId, metric, label, yLabel) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  const datasets = tsData.reels.map((r, i) => ({
+    label: r.label,
+    data: r.timestamps.map((t, j) => ({ x: t, y: r[metric][j] })),
+    borderColor: COLORS[i % COLORS.length],
+    backgroundColor: COLORS[i % COLORS.length] + '33',
+    tension: 0.3,
+    fill: false,
+    pointRadius: 3,
+  }));
+  new Chart(ctx, {
+    type: 'line',
+    data: { datasets },
+    options: {
+      ...makeChartOptions(yLabel),
+      scales: {
+        ...makeChartOptions(yLabel).scales,
+        x: { ...makeChartOptions(yLabel).scales.x, type: 'category' }
+      }
+    }
+  });
+}
+
+function buildComparisonChart(canvasId, metrics, labels, stacked) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  const datasets = metrics.map((m, i) => ({
+    label: m.label,
+    data: compData.labels.map(l => {
+      const r = compData.data.find(d => d.shortcode === compData.shortcodes[compData.labels.indexOf(l)] || d.label === l);
+      return r ? (r[m.key] ?? 0) : 0;
+    }),
+    backgroundColor: COLORS[i % COLORS.length] + 'cc',
+    borderColor: COLORS[i % COLORS.length],
+    borderWidth: 1,
+  }));
+  // Simpler: one dataset per metric, one bar per reel
+  const ds2 = metrics.map((m, i) => ({
+    label: m.label,
+    data: compData.data.map(d => d[m.key] ?? 0),
+    backgroundColor: COLORS[i % COLORS.length] + 'cc',
+    borderColor: COLORS[i % COLORS.length],
+    borderWidth: 1,
+  }));
+  new Chart(ctx, {
+    type: 'bar',
+    data: { labels: compData.data.map(d => d.label), datasets: ds2 },
+    options: makeBarOptions(stacked),
+  });
+}
+
+// Build time-series charts
+buildTimeseriesChart('viewsChart', 'views', 'Views', 'Views');
+buildTimeseriesChart('likesChart', 'likes', 'Likes', 'Likes');
+buildTimeseriesChart('commentsChart', 'comments', 'Comments', 'Comments');
+buildTimeseriesChart('engChart', 'engagement_rate', 'Engagement Rate', '%');
+
+// Build comparison charts
+buildComparisonChart('compViewsChart', [{label: 'Views', key: 'views'}], [], false);
+buildComparisonChart('compEngChart', [
+  {label: 'Likes', key: 'likes'},
+  {label: 'Comments', key: 'comments'},
+], [], false);
+</script>
+</body>
+</html>
