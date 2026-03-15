@@ -36,3 +36,26 @@ storage:
 report:
   output_dir: "reports"
   html_file: "dashboard.html"
+
+# 랜딩페이지 DB 연결 (Neon PostgreSQL)
+# Set via NEON_CONNECTION_STRING env var (recommended) or paste here
+funnel_db:
+  connection_string: ""
+  referral_codes:
+    - "xeo.yuunny"
+    - "ha_n_a0.6"
+    - "esther_ffff"
+    - "caiime_pretty"
+    - "thinxoyoon"
+
+# 채팅 콘텐츠 버전 기점
+# 이 리스트를 기준으로 분석 시 버전 전후를 자동 분류합니다.
+chat_versions:
+  - version: "v1"
+    label: "최초 버전"
+    start_kst: null  # 서비스 시작부터
+    end_kst: "2026-03-15 16:20:00"
+  - version: "v2"
+    label: "콘텐츠 업데이트 #1"
+    start_kst: "2026-03-15 16:20:00"
+    end_kst: null  # 다음 업데이트 시까지

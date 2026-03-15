@@ -82,11 +82,125 @@ def _insight_text(metrics: list[dict]) -> str:
     return "<br>".join(lines)
 
 
+def _build_funnel_section(funnel: dict) -> str:
+    """Build HTML for chat version comparison funnel section."""
+    if not funnel or not funnel.get("by_version"):
+        return ""
+
+    by_version = funnel["by_version"]
+    by_code_version = funnel.get("by_code_version", [])
+
+    # ── Overall version comparison table ──────────────────────────
+    header_cells = "".join(
+        f"<th>{r['version']}</th>" for r in by_version
+    )
+
+    def metric_row(label, key, suffix=""):
+        cells = ""
+        prev_val = None
+        for r in by_version:
+            raw = r.get(key)
+            val = float(raw) if raw is not None else None
+            display = f"{val:g}{suffix}" if val is not None else "—"
+            # Highlight change vs previous version
+            if prev_val is not None and val is not None:
+                diff = val - prev_val
+                if abs(diff) > 0.01:
+                    sign = "+" if diff > 0 else ""
+                    cls = "dup" if diff > 0 else "ddn"
+                    display += f' <span class="{cls}">{sign}{diff:.1f}{suffix}</span>'
+            prev_val = val
+            cells += f"<td>{display}</td>"
+        return f"<tr><td class='metric-label'>{label}</td>{cells}</tr>"
+
+    overview_rows = "".join([
+        metric_row("세션 수", "sessions"),
+        metric_row("채팅 시작율", "chat_rate", "%"),
+        metric_row("CTA 도달율 (chat→3번)", "cta_of_chat", "%"),
+        metric_row("CTA 전환율 (3번→전화)", "cta_conv", "%"),
+        metric_row("최종 전환율 (세션→전화)", "phone_rate", "%"),
+        metric_row("전화 제출 수", "phone_sub"),
+    ])
+
+    overview_table = f"""
+<table class="funnel-table">
+  <thead>
+    <tr><th>지표</th>{header_cells}</tr>
+  </thead>
+  <tbody>
+    {overview_rows}
+  </tbody>
+</table>"""
+
+    # ── Per referral-code × version pivot ─────────────────────────
+    # Gather unique referral codes and versions in order
+    codes = list(dict.fromkeys(r["referral_code"] for r in by_code_version))
+    versions = list(dict.fromkeys(r["version"] for r in by_code_version))
+
+    # Build lookup: (code, version) -> row
+    lookup = {(r["referral_code"], r["version"]): r for r in by_code_version}
+
+    code_header = "".join(f"<th colspan='2'>{v}</th>" for v in versions)
+    sub_header = "".join("<th>세션</th><th>전환율</th>" for _ in versions)
+
+    code_rows = ""
+    for code in codes:
+        cells = ""
+        for v in versions:
+            row = lookup.get((code, v))
+            if row:
+                sessions = row.get("sessions") or "—"
+                rate = row.get("phone_rate")
+                rate_disp = f"{float(rate):.2f}%" if rate is not None else "—"
+            else:
+                sessions, rate_disp = "—", "—"
+            cells += f"<td>{sessions}</td><td>{rate_disp}</td>"
+        code_rows += f"<tr><td>@{code}</td>{cells}</tr>"
+
+    code_table = f"""
+<table class="funnel-table">
+  <thead>
+    <tr><th>계정</th>{code_header}</tr>
+    <tr><th></th>{sub_header}</tr>
+  </thead>
+  <tbody>
+    {code_rows}
+  </tbody>
+</table>"""
+
+    # ── Version metadata badges ────────────────────────────────────
+    version_badges = ""
+    for v in funnel.get("versions", []):
+        start = v.get("start_kst") or "서비스 시작"
+        end = v.get("end_kst") or "현재"
+        # Display KST times stored in config directly (already KST)
+        # The stored values in versions dict are UTC; label stays original
+        version_badges += f'<span class="ver-badge">{v["version"]}: {v["label"]}</span> '
+
+    return f"""
+<div class="section">
+  <div class="section-label">채팅 버전별 전환율 비교</div>
+  <div class="funnel-note">
+    {version_badges}
+    <span class="funnel-hint">※ 기점: 2026-03-15 16:20 KST (채팅 콘텐츠 업데이트 #1)</span>
+  </div>
+  <div style="margin-top:16px">
+    <div class="funnel-subtitle">전체 퍼널 (버전별)</div>
+    {overview_table}
+  </div>
+  <div style="margin-top:20px">
+    <div class="funnel-subtitle">계정별 세션 수 · 전환율 (버전별)</div>
+    {code_table}
+  </div>
+</div>"""
+
+
 def generate_html_dashboard(
     latest_metrics: list[dict],
     history: dict[str, list[dict]],
     output_path: str,
     history_days: int = 30,
+    funnel: dict | None = None,
 ) -> str:
     generated_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
 
@@ -101,6 +215,7 @@ def generate_html_dashboard(
     cards_html = _build_cards(ranked, history)
     ts_data = _build_timeseries(history, ranked)
     comp_data = _build_comparison(ranked)
+    funnel_html = _build_funnel_section(funnel or {})
 
     html = f"""<!DOCTYPE html>
 <html lang="ko">
@@ -198,6 +313,22 @@ a:hover {{ text-decoration: underline; }}
 
 .collected {{ font-size: 0.65rem; color: #334155; margin-top: 12px; text-align: right; }}
 footer {{ text-align: center; font-size: 0.7rem; color: #1e293b; margin-top: 40px; }}
+
+/* Funnel version section */
+.funnel-note {{ font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }}
+.funnel-hint {{ font-size: 0.72rem; color: #334155; }}
+.funnel-subtitle {{ font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase;
+                    letter-spacing: .06em; margin-bottom: 8px; }}
+.ver-badge {{ display: inline-block; background: #1e1b4b; color: #818cf8;
+              border: 1px solid #312e81; border-radius: 9999px; padding: 2px 10px;
+              font-size: 0.72rem; font-weight: 600; margin-right: 6px; }}
+.funnel-table {{ width: 100%; border-collapse: collapse; font-size: 0.82rem; }}
+.funnel-table th {{ background: var(--surface2); color: var(--muted); padding: 8px 12px;
+                    text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }}
+.funnel-table td {{ padding: 8px 12px; border-bottom: 1px solid #111827; }}
+.funnel-table td.metric-label {{ color: #94a3b8; font-size: 0.78rem; }}
+.funnel-table tr:last-child td {{ border-bottom: none; }}
+.funnel-table tr:hover td {{ background: #111827; }}
 </style>
 </head>
 <body>
@@ -240,6 +371,8 @@ footer {{ text-align: center; font-size: 0.7rem; color: #1e293b; margin-top: 40p
     </div>
   </div>
 </div>
+
+{funnel_html}
 
 <div class="section">
   <div class="section-label">시간별 추이</div>

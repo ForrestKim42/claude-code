@@ -94,13 +94,29 @@ a:hover { text-decoration: underline; }
 
 .collected { font-size: 0.65rem; color: #334155; margin-top: 12px; text-align: right; }
 footer { text-align: center; font-size: 0.7rem; color: #1e293b; margin-top: 40px; }
+
+/* Funnel version section */
+.funnel-note { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+.funnel-hint { font-size: 0.72rem; color: #334155; }
+.funnel-subtitle { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase;
+                    letter-spacing: .06em; margin-bottom: 8px; }
+.ver-badge { display: inline-block; background: #1e1b4b; color: #818cf8;
+              border: 1px solid #312e81; border-radius: 9999px; padding: 2px 10px;
+              font-size: 0.72rem; font-weight: 600; margin-right: 6px; }
+.funnel-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.funnel-table th { background: var(--surface2); color: var(--muted); padding: 8px 12px;
+                    text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+.funnel-table td { padding: 8px 12px; border-bottom: 1px solid #111827; }
+.funnel-table td.metric-label { color: #94a3b8; font-size: 0.78rem; }
+.funnel-table tr:last-child td { border-bottom: none; }
+.funnel-table tr:hover td { background: #111827; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>📊 광고 릴스 성과 대시보드</h1>
-  <div class="meta">수집: 2026-03-15 04:43 UTC &nbsp;·&nbsp; 최근 30일 데이터</div>
+  <div class="meta">수집: 2026-03-15 07:26 UTC &nbsp;·&nbsp; 최근 30일 데이터</div>
 </div>
 
 <div class="insight">📌 조회수 1위는 <b>서윤</b> (34.4K views) — 노출량 최고<br>💬 참여율 1위는 <b>지여닝</b> (6.21%) — 조회수는 낮아도 반응이 뜨거움<br>⚠️ <b>서윤</b>은 조회수(34.4K) 대비 참여율(0.40%)이 낮음 — 광고 소재 개선 검토</div>
@@ -382,6 +398,40 @@ footer { text-align: center; font-size: 0.7rem; color: #1e293b; margin-top: 40px
       <h3>재생수 비교 (Plays — 반복 포함)</h3>
       <div class="chart-wrap"><canvas id="cPlays"></canvas></div>
     </div>
+  </div>
+</div>
+
+
+<div class="section">
+  <div class="section-label">채팅 버전별 전환율 비교</div>
+  <div class="funnel-note">
+    <span class="ver-badge">v1: 최초 버전</span> <span class="ver-badge">v2: 콘텐츠 업데이트 #1</span> 
+    <span class="funnel-hint">※ 기점: 2026-03-15 16:20 KST (채팅 콘텐츠 업데이트 #1)</span>
+  </div>
+  <div style="margin-top:16px">
+    <div class="funnel-subtitle">전체 퍼널 (버전별)</div>
+    
+<table class="funnel-table">
+  <thead>
+    <tr><th>지표</th><th>v1 (최초 버전)</th><th>v2 (콘텐츠 업데이트 #1)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class='metric-label'>세션 수</td><td>2152</td><td>1 <span class="ddn">-2151.0</span></td></tr><tr><td class='metric-label'>채팅 시작율</td><td>30.9%</td><td>0% <span class="ddn">-30.9%</span></td></tr><tr><td class='metric-label'>CTA 도달율 (chat→3번)</td><td>48.6%</td><td>—</td></tr><tr><td class='metric-label'>CTA 전환율 (3번→전화)</td><td>9.6%</td><td>—</td></tr><tr><td class='metric-label'>최종 전환율 (세션→전화)</td><td>1.44%</td><td>0% <span class="ddn">-1.4%</span></td></tr><tr><td class='metric-label'>전화 제출 수</td><td>31</td><td>0 <span class="ddn">-31.0</span></td></tr>
+  </tbody>
+</table>
+  </div>
+  <div style="margin-top:20px">
+    <div class="funnel-subtitle">계정별 세션 수 · 전환율 (버전별)</div>
+    
+<table class="funnel-table">
+  <thead>
+    <tr><th>계정</th><th colspan='2'>v1 (최초 버전)</th><th colspan='2'>v2 (콘텐츠 업데이트 #1)</th></tr>
+    <tr><th></th><th>세션</th><th>전환율</th><th>세션</th><th>전환율</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>@caiime_pretty</td><td>31</td><td>0.00%</td><td>—</td><td>—</td></tr><tr><td>@esther_ffff</td><td>71</td><td>1.41%</td><td>—</td><td>—</td></tr><tr><td>@ha_n_a0.6</td><td>32</td><td>3.13%</td><td>—</td><td>—</td></tr><tr><td>@thinxoyoon</td><td>26</td><td>3.85%</td><td>—</td><td>—</td></tr><tr><td>@xeo.yuunny</td><td>1992</td><td>1.41%</td><td>1</td><td>0.00%</td></tr>
+  </tbody>
+</table>
   </div>
 </div>
 

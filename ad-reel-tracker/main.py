@@ -94,6 +94,7 @@ def collect(cfg: dict, force_apify: bool = False) -> list:
 
 def report(cfg: dict) -> str:
     from tracker.storage import get_all_metrics_history, get_latest_metrics, init_db
+    from tracker.funnel_db import get_funnel_by_version
     from reporter.html_report import generate_html_dashboard
 
     db_path = cfg["storage"]["db_path"]
@@ -106,11 +107,18 @@ def report(cfg: dict) -> str:
     history = get_all_metrics_history(conn, days=30)
     conn.close()
 
+    funnel = get_funnel_by_version(cfg)
+    if funnel:
+        logger.info("Funnel data loaded — version split applied")
+    else:
+        logger.info("Funnel data unavailable — skipping version comparison")
+
     path = generate_html_dashboard(
         latest_metrics=latest,
         history=history,
         output_path=output_path,
         history_days=30,
+        funnel=funnel,
     )
     logger.info(f"Dashboard saved: {path}")
     return path
