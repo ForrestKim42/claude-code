@@ -36,6 +36,7 @@ storage:
 report:
   output_dir: "reports"
   html_file: "dashboard.html"
+  cost_per_reel: 40000  # 릴스 1개당 집행 비용 (원)
 
 # 랜딩페이지 DB 연결 (Neon PostgreSQL)
 # Set via NEON_CONNECTION_STRING env var (recommended) or paste here

@@ -92,6 +92,70 @@ def collect(cfg: dict, force_apify: bool = False) -> list:
     return metrics_list
 
 
+def _build_cost_rows(latest: list[dict], funnel: dict, cost_per_reel: int) -> list[dict]:
+    """Merge reel metrics + funnel data into cost-per-metric rows."""
+    funnel_by_code = {r["referral_code"]: r for r in funnel.get("by_code_version", [])
+                      if r.get("version", "").startswith("v1")}
+    # Aggregate all versions per code
+    agg: dict[str, dict] = {}
+    for r in funnel.get("by_code_version", []):
+        code = r["referral_code"]
+        if code not in agg:
+            agg[code] = {"sessions": 0, "chatted": 0, "cta": 0, "phone": 0}
+        agg[code]["sessions"] += int(r.get("sessions") or 0)
+        agg[code]["chatted"]  += int(r.get("chatted") or 0)
+        agg[code]["cta"]      += int(r.get("reached_cta") or 0) if "reached_cta" in r else 0
+        agg[code]["phone"]    += int(r.get("phone_sub") or 0)
+
+    def cpx(n):
+        return round(cost_per_reel / n) if n and int(n) > 0 else None
+
+    rows = []
+    for m in latest:
+        if m.get("error") or not m.get("views"):
+            continue
+        code = m.get("owner_username", "")
+        f = agg.get(code, {})
+        views    = m.get("views") or 0
+        plays    = m.get("plays") or 0
+        sessions = f.get("sessions", 0)
+        chatted  = f.get("chatted", 0)
+        cta      = f.get("cta", 0)
+        phone    = f.get("phone", 0)
+        rows.append({
+            "code": code,
+            "name": m.get("owner_name") or m.get("label", ""),
+            "views": views, "plays": plays,
+            "sessions": sessions, "chatted": chatted, "cta": cta, "phone": phone,
+            "ctr": round(sessions / views * 100, 2) if views else 0,
+            "cpv":  cpx(views),
+            "cps":  cpx(sessions),
+            "cpc":  cpx(chatted),
+            "cpca": cpx(cta),
+            "cpph": cpx(phone),
+        })
+
+    # Total row
+    total_cost = cost_per_reel * len(rows)
+    tv = sum(r["views"] for r in rows)
+    ts = sum(r["sessions"] for r in rows)
+    tc = sum(r["chatted"] for r in rows)
+    tt = sum(r["cta"] for r in rows)
+    tp = sum(r["phone"] for r in rows)
+    rows.append({
+        "code": "__total__",
+        "name": "전체 합계",
+        "views": tv, "sessions": ts, "chatted": tc, "cta": tt, "phone": tp,
+        "ctr": 0,
+        "cpv":  round(total_cost / tv) if tv else None,
+        "cps":  round(total_cost / ts) if ts else None,
+        "cpc":  round(total_cost / tc) if tc else None,
+        "cpca": round(total_cost / tt) if tt else None,
+        "cpph": round(total_cost / tp) if tp else None,
+    })
+    return rows
+
+
 def report(cfg: dict) -> str:
     from tracker.storage import get_all_metrics_history, get_latest_metrics, init_db
     from tracker.funnel_db import get_funnel_by_version
@@ -113,12 +177,16 @@ def report(cfg: dict) -> str:
     else:
         logger.info("Funnel data unavailable — skipping version comparison")
 
+    cost_per_reel = cfg.get("report", {}).get("cost_per_reel", 40_000)
+    cost_rows = _build_cost_rows(latest, funnel, cost_per_reel) if funnel else []
+
     path = generate_html_dashboard(
         latest_metrics=latest,
         history=history,
         output_path=output_path,
         history_days=30,
         funnel=funnel,
+        cost_rows=cost_rows,
     )
     logger.info(f"Dashboard saved: {path}")
     return path

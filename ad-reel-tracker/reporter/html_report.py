@@ -82,6 +82,103 @@ def _insight_text(metrics: list[dict]) -> str:
     return "<br>".join(lines)
 
 
+def _build_cost_section(cost_rows: list[dict]) -> str:
+    """Build HTML cost-per-metric comparison table."""
+    if not cost_rows:
+        return ""
+
+    def fmt_cost(v):
+        if v is None:
+            return '<span style="color:#f87171">∞</span>'
+        if v >= 10_000:
+            return f'<b style="color:#f87171">{v:,}원</b>'
+        if v >= 1_000:
+            return f'<span style="color:#fbbf24">{v:,}원</span>'
+        return f'<span style="color:#34d399">{v:,}원</span>'
+
+    # Find best (min) for each column to highlight
+    cols = ['cpv', 'cps', 'cpc', 'cpca', 'cpph']
+    bests = {}
+    for col in cols:
+        vals = [r[col] for r in cost_rows if r.get(col) is not None]
+        bests[col] = min(vals) if vals else None
+
+    def cell(r, col):
+        v = r.get(col)
+        if v is None:
+            return '<td><span style="color:#f87171">∞</span></td>'
+        style = 'background:#052e16;' if v == bests.get(col) else ''
+        return f'<td style="{style}">{fmt_cost(v)}</td>'
+
+    rows_html = ""
+    for r in cost_rows:
+        name = r.get('name', '')
+        code = r.get('code', '')
+        ctr = r.get('ctr', 0)
+        rows_html += f"""<tr>
+          <td><b>{name}</b><br><span style="color:#64748b;font-size:.72rem">@{code}</span></td>
+          <td style="color:#94a3b8">{r.get('views',0):,}</td>
+          <td style="color:#94a3b8">{r.get('sessions',0):,}</td>
+          <td style="color:#94a3b8">{ctr}%</td>
+          {cell(r,'cpv')}{cell(r,'cps')}{cell(r,'cpc')}{cell(r,'cpca')}{cell(r,'cpph')}
+        </tr>"""
+
+    # Total row
+    total = cost_rows[-1] if cost_rows and cost_rows[-1].get('code') == '__total__' else None
+    total_html = ""
+    if total:
+        cost_rows = cost_rows[:-1]
+        total_html = f"""<tr style="border-top:2px solid #374151;background:#111827">
+          <td><b>전체 합계</b></td>
+          <td style="color:#94a3b8">{total.get('views',0):,}</td>
+          <td style="color:#94a3b8">{total.get('sessions',0):,}</td>
+          <td style="color:#94a3b8">—</td>
+          {cell(total,'cpv')}{cell(total,'cps')}{cell(total,'cpc')}{cell(total,'cpca')}{cell(total,'cpph')}
+        </tr>"""
+
+    # Rebuild rows excluding __total__
+    rows_html = ""
+    for r in [x for x in cost_rows if x.get('code') != '__total__']:
+        name = r.get('name', '')
+        code = r.get('code', '')
+        ctr = r.get('ctr', 0)
+        rows_html += f"""<tr>
+          <td><b>{name}</b><br><span style="color:#64748b;font-size:.72rem">@{code}</span></td>
+          <td style="color:#94a3b8">{r.get('views',0):,}</td>
+          <td style="color:#94a3b8">{r.get('sessions',0):,}</td>
+          <td style="color:#94a3b8">{ctr}%</td>
+          {cell(r,'cpv')}{cell(r,'cps')}{cell(r,'cpc')}{cell(r,'cpca')}{cell(r,'cpph')}
+        </tr>"""
+
+    return f"""
+<div class="section">
+  <div class="section-label">비용 효율 분석 — 릴스당 40,000원 기준</div>
+  <div class="funnel-note">
+    총 집행 비용 <b>200,000원</b> · 총 유효 리드 <b>{sum(r.get('phone',0) for r in cost_rows if r.get('code') != '__total__')}건</b> · 평균 CP-Lead <b style="color:#818cf8">{200000 // max(1, sum(r.get('phone',0) for r in cost_rows if r.get('code') != '__total__')):,}원</b>
+    &nbsp;·&nbsp; <span style="color:#64748b;font-size:.75rem">초록 = 최저비용(최고효율) · 빨강 = 고비용</span>
+  </div>
+  <table class="funnel-table" style="margin-top:12px">
+    <thead>
+      <tr>
+        <th>계정</th>
+        <th>Views</th>
+        <th>세션</th>
+        <th>CTR</th>
+        <th>CPV<br><span style="font-weight:400;font-size:.7rem">뷰당</span></th>
+        <th>CPS<br><span style="font-weight:400;font-size:.7rem">세션당</span></th>
+        <th>CP-Chat<br><span style="font-weight:400;font-size:.7rem">채팅당</span></th>
+        <th>CP-CTA<br><span style="font-weight:400;font-size:.7rem">CTA당</span></th>
+        <th>CP-Lead<br><span style="font-weight:400;font-size:.7rem">전화제출당</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows_html}
+      {total_html}
+    </tbody>
+  </table>
+</div>"""
+
+
 def _build_funnel_section(funnel: dict) -> str:
     """Build HTML for chat version comparison funnel section."""
     if not funnel or not funnel.get("by_version"):
@@ -201,6 +298,7 @@ def generate_html_dashboard(
     output_path: str,
     history_days: int = 30,
     funnel: dict | None = None,
+    cost_rows: list[dict] | None = None,
 ) -> str:
     generated_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
 
@@ -216,6 +314,7 @@ def generate_html_dashboard(
     ts_data = _build_timeseries(history, ranked)
     comp_data = _build_comparison(ranked)
     funnel_html = _build_funnel_section(funnel or {})
+    cost_html = _build_cost_section(cost_rows or [])
 
     html = f"""<!DOCTYPE html>
 <html lang="ko">
@@ -371,6 +470,8 @@ footer {{ text-align: center; font-size: 0.7rem; color: #1e293b; margin-top: 40p
     </div>
   </div>
 </div>
+
+{cost_html}
 
 {funnel_html}
 
