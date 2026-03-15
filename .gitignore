@@ -1,2 +1,18 @@
 .DS_Store
 
+# Ignored — not part of this branch
+.claude-plugin/
+.claude/
+.devcontainer/
+.gitattributes
+.github/
+.vscode/
+CHANGELOG.md
+LICENSE.md
+README.md
+SECURITY.md
+Script/
+demo.gif
+examples/
+plugins/
+scripts/
